@@ -1,15 +1,13 @@
-const mongoose = require('mongoose');
+const mongoose = require('mongoose')
 
-mongoose.connect('mongodb://127.0.0.1:27017/myblog')
-    .then(
-        ()=>{
-            console.log('connected');
-        }
-    )
-    .catch(
-        (err)=>{
-            console.log(err);
-        }
-    )
+const url = 'mongodb+srv://safa:FLAvwQsDfzvUDuvO@cluster0.rhacs.mongodb.net/myblog';
+
+mongoose.connect(url)
+    .then( () => {
+        console.log('Connected to the database ')
+    })
+    .catch( (err) => {
+        console.error(`Error connecting to the database. n${err}`);
+    })
 
 module.exports = mongoose;
