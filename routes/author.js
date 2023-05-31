@@ -109,36 +109,49 @@ router.post('/register', upload.any('image'), (req, res) => {
         )
 })*/
 
-router.post('/login', (req, res) => {
+router.post('/login' , (req, res)=>{
+
     let data = req.body;
-  
-    Author.findOne({ email: data.email })
-      .then((author) => {
-        if (!author) {
-          res.send('email or password invalid');
-        } else {
-          let valid = bcrypt.compareSync(data.password, author.password);
-          if (!valid) {
-            res.send('email or password invalid');
-          } else {
-            let payload = {
-              _id: author._id,
-              email: author.email,
-              fullname: author.name + ' ' + author.lastname,
-            };
-            
-            let token = jwt.sign(payload, process.env.JWT_SECRET);
-  
-            // Sanitize the 'token' variable before sending it in the response
-            const sanitizedToken = sanitize(token); // Replace 'sanitize' with the appropriate function
-            res.send({ myToken: sanitizedToken });
-          }
-        }
-      })
-      .catch((err) => {
-        res.send(sanitizeErrorMessage(err));
-      });
-  });
+
+    Author.findOne({email: data.email})
+        .then(
+            (author)=>{
+                if(author != null){
+                    let valid = bcrypt.compareSync(data.password , author.password);
+                    if(!valid){
+                        res.send('email or password invalid');
+                    }else{
+
+                        let payload = {
+                            _id: author._id,
+                            email: author.email,
+                            fullname: author.name + ' ' + author.lastname
+                        }
+
+                        let token = jwt.sign(payload , '123456789');
+
+                        res.send({ myToken: token })
+
+                    }
+                }
+                else{
+                    res.send('email or password invalid');
+                }
+
+
+            }
+
+
+        )
+        .catch(
+            err=>{
+                res.send(err);
+            }
+        )
+
+
+
+})
   
 
 
