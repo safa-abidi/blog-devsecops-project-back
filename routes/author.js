@@ -1,6 +1,7 @@
 const express = require('express');
-
 const router = express.Router();
+require('dotenv').config(); // Load environment variables from .env file
+
 
 
 const Author = require('../models/author');
@@ -125,8 +126,8 @@ router.post('/login', (req, res) => {
               email: author.email,
               fullname: author.name + ' ' + author.lastname,
             };
-  
-            let token = jwt.sign(payload, '123456789');
+            
+            let token = jwt.sign(payload, process.env.JWT_SECRET);
   
             // Sanitize the 'token' variable before sending it in the response
             const sanitizedToken = sanitize(token); // Replace 'sanitize' with the appropriate function
