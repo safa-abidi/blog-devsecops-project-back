@@ -56,28 +56,34 @@ router.post('/register' , upload.any('image') , (req, res)=>{
 
 
 router.post('/login' , (req, res)=>{
-    
+
     let data = req.body;
 
     Author.findOne({email: data.email})
         .then(
             (author)=>{
-                let valid = bcrypt.compareSync(data.password , author.password);
-                if(!valid){
-                    res.send('email or password invalid');
-                }else{
+                if(author != null){
+                    let valid = bcrypt.compareSync(data.password , author.password);
+                    if(!valid){
+                        res.send('email or password invalid');
+                    }else{
 
-                    let payload = {
-                        _id: author._id,
-                        email: author.email,
-                        fullname: author.name + ' ' + author.lastname
+                        let payload = {
+                            _id: author._id,
+                            email: author.email,
+                            fullname: author.name + ' ' + author.lastname
+                        }
+
+                        let token = jwt.sign(payload , '123456789');
+
+                        res.send({ myToken: token })
+
                     }
-
-                    let token = jwt.sign(payload , '123456789');
-
-                    res.send({ myToken: token })
-
                 }
+                else{
+                    res.send('email or password invalid');
+                }
+
 
             }
 
