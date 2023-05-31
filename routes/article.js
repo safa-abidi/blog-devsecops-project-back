@@ -24,7 +24,7 @@ const mystorage = multer.diskStorage({
 const upload = multer({storage: mystorage})
 
 
-router.post('/ajout', upload.any('image') , (req , res)=>{
+/*router.post('/ajout', upload.any('image') , (req , res)=>{
 
     let data = req.body;
     let article = new Article(data);
@@ -36,7 +36,8 @@ router.post('/ajout', upload.any('image') , (req , res)=>{
         .then(
             (saved)=>{
                 filename = '';
-                res.status(200).send(saved);
+                const sanitizedData = sanitize(saved);
+                res.status(200).send(sanitizedData);
             }
         )
         .catch(
@@ -46,9 +47,36 @@ router.post('/ajout', upload.any('image') , (req , res)=>{
         )
 
 
-})
+})*/
 
-router.get('/all', (req , res)=>{
+router.post('/ajout', upload.any('image'), [
+  body('tags').not().isEmpty().trim().escape(), // Sanitize the 'tags' field
+], (req, res) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(400).json({ errors: errors.array() });
+  }
+
+  let data = req.body;
+  let article = new Article(data);
+  article.date = new Date();
+  article.image = filename;
+  article.tags = data.tags.split(',');
+
+  article.save()
+    .then((saved) => {
+      filename = '';
+      // Sanitize the 'saved' variable before sending it in the response
+      const sanitizedData = sanitize(saved); // Replace 'sanitize' with the appropriate function
+      res.status(200).send(sanitizedData);
+    })
+    .catch(err => {
+      res.status(400).send(err);
+    });
+});
+
+
+/*router.get('/all', (req , res)=>{
 
     Article.find({})
         .then(
@@ -61,11 +89,22 @@ router.get('/all', (req , res)=>{
                 res.status(400).send(err);
             }
         )
+})*/
 
-    
-})
+router.get('/all', (req, res) => {
+    Article.find({})
+      .then((articles) => {
+        // Sanitize the 'articles' variable before sending it in the response
+        const sanitizedData = sanitize(articles); // Replace 'sanitize' with the appropriate function
+        res.status(200).send(sanitizedData);
+      })
+      .catch((err) => {
+        res.status(400).send(err);
+      });
+  });
+  
 
-router.get('/getbyid/:id', (req , res)=>{
+/*router.get('/getbyid/:id', (req , res)=>{
     
     let id = req.params.id
 
@@ -80,10 +119,31 @@ router.get('/getbyid/:id', (req , res)=>{
             res.status(400).send(err);
         }
     )
+})*/
 
-})
+router.get('/getbyid/:id', [
+    param('id').isMongoId(), // Validate that the 'id' parameter is a valid MongoDB ObjectId
+  ], (req, res) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
+    }
+  
+    let id = req.params.id;
+  
+    Article.findOne({ _id: id })
+      .then((article) => {
+        // Sanitize the 'article' variable before sending it in the response
+        const sanitizedData = sanitize(article); // Replace 'sanitize' with the appropriate function
+        res.status(200).send(sanitizedData);
+      })
+      .catch((err) => {
+        res.status(400).send(err);
+      });
+  });
+  
 
-router.get('/getbyidauthor/:id', (req , res)=>{
+/*router.get('/getbyidauthor/:id', (req , res)=>{
 
         
     let id = req.params.id
@@ -99,10 +159,31 @@ router.get('/getbyidauthor/:id', (req , res)=>{
             res.status(400).send(err);
         }
     )
-    
-})
+})*/
 
-router.delete('/supprimer/:id', (req , res)=>{
+router.get('/getbyidauthor/:id', [
+    param('id').isMongoId(), // Validate that the 'id' parameter is a valid MongoDB ObjectId
+  ], (req, res) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
+    }
+  
+    let id = req.params.id;
+  
+    Article.find({ idAuthor: id })
+      .then((articles) => {
+        // Sanitize the 'articles' variable before sending it in the response
+        const sanitizedData = sanitize(articles); // Replace 'sanitize' with the appropriate function
+        res.status(200).send(sanitizedData);
+      })
+      .catch((err) => {
+        res.status(400).send(err);
+      });
+  });
+  
+
+/*router.delete('/supprimer/:id', (req , res)=>{
     
     let id = req.params.id
 
@@ -117,11 +198,31 @@ router.delete('/supprimer/:id', (req , res)=>{
                 res.status(400).send(err);
             }
         )
+})*/
 
-})
+router.delete('/supprimer/:id', [
+    param('id').isMongoId(), // Validate that the 'id' parameter is a valid MongoDB ObjectId
+  ], (req, res) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
+    }
+  
+    let id = req.params.id;
+  
+    Article.findByIdAndDelete({ _id: id })
+      .then((article) => {
+        // Sanitize the 'article' variable before sending it in the response
+        const sanitizedData = sanitize(article); // Replace 'sanitize' with the appropriate function
+        res.status(200).send(sanitizedData);
+      })
+      .catch((err) => {
+        res.status(400).send(err);
+      });
+  });
+  
 
-router.put('/update/:id', upload.any('image') , (req , res)=>{
-    
+/*router.put('/update/:id', upload.any('image') , (req , res)=>{
     let id = req.params.id
     let data = req.body;
     data.tags = data.tags.split(',');
@@ -129,8 +230,6 @@ router.put('/update/:id', upload.any('image') , (req , res)=>{
     if(filename.length > 0){
         data.image = filename;
     }
-
-
     Article.findByIdAndUpdate({ _id: id } , data )
         .then(
             (article)=>{
@@ -143,9 +242,36 @@ router.put('/update/:id', upload.any('image') , (req , res)=>{
                 res.status(400).send(err);
             }
         )
+})*/
 
- 
-})
+router.put('/update/:id', upload.any('image'), [
+    param('id').isMongoId(), // Validate that the 'id' parameter is a valid MongoDB ObjectId
+  ], (req, res) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
+    }
+  
+    let id = req.params.id;
+    let data = req.body;
+    data.tags = data.tags.split(',');
+  
+    if (filename.length > 0) {
+      data.image = filename;
+    }
+  
+    Article.findByIdAndUpdate({ _id: id }, data)
+      .then((article) => {
+        filename = '';
+        // Sanitize the 'article' variable before sending it in the response
+        const sanitizedData = sanitize(article); // Replace 'sanitize' with the appropriate function
+        res.status(200).send(sanitizedData);
+      })
+      .catch((err) => {
+        res.status(400).send(err);
+      });
+  });
+  
 
 
 
