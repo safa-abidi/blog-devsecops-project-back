@@ -63,22 +63,28 @@ router.post('/login' , (req, res)=>{
     Author.findOne({email: data.email})
         .then(
             (author)=>{
-                let valid = bcrypt.compareSync(data.password , author.password);
-                if(!valid){
+                if(!author){
                     res.send('email or password invalid');
-                }else{
-
-                    let payload = {
-                        _id: author._id,
-                        email: author.email,
-                        fullname: author.name + ' ' + author.lastname
-                    }
-
-                    let token = jwt.sign(payload , process.env.SECRET_KEY);
-
-                    res.send({ myToken: token })
-
                 }
+                else{
+                    let valid = bcrypt.compareSync(data.password , author.password);
+                    if(!valid){
+                        res.send('email or password invalid');
+                    }else{
+
+                        let payload = {
+                            _id: author._id,
+                            email: author.email,
+                            fullname: author.name + ' ' + author.lastname
+                        }
+
+                        let token = jwt.sign(payload , process.env.SECRET_KEY);
+
+                        res.send({ myToken: token })
+
+                    }
+                }
+
 
             }
 
