@@ -24,7 +24,7 @@ const mystorage = multer.diskStorage({
 const upload = multer({storage: mystorage})
 
 
-/*router.post('/ajout', upload.any('image') , (req , res)=>{
+router.post('/ajout', upload.any('image') , (req , res)=>{
 
     let data = req.body;
     let article = new Article(data);
@@ -33,37 +33,6 @@ const upload = multer({storage: mystorage})
     article.tags = data.tags.split(',');
 
     article.save()
-        .then(
-            (saved)=>{
-                filename = '';
-                const sanitizedData = sanitize(saved);
-                res.status(200).send(sanitizedData);
-            }
-        )
-        .catch(
-            err=>{
-                res.status(400).send(err)
-            }
-        )
-
-
-})*/
-
-router.post('/ajout', upload.any('image'), [
-  body('tags').not().isEmpty().trim().escape(), // Sanitize the 'tags' field
-], (req, res) => {
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) {
-    return res.status(400).json({ errors: errors.array() });
-  }
-
-  let data = req.body;
-  let article = new Article(data);
-  article.date = new Date();
-  article.image = filename;
-  article.tags = data.tags.split(',');
-
-  article.save()
     .then((saved) => {
       filename = '';
       // Sanitize the 'saved' variable before sending it in the response
@@ -74,7 +43,6 @@ router.post('/ajout', upload.any('image'), [
       res.status(400).send(err);
     });
 });
-
 
 /*router.get('/all', (req , res)=>{
 
@@ -104,33 +72,10 @@ router.get('/all', (req, res) => {
   });
   
 
-/*router.get('/getbyid/:id', (req , res)=>{
+router.get('/getbyid/:id', (req , res)=>{
     
     let id = req.params.id
 
-    Article.findOne({ _id: id })
-    .then(
-        (articles)=>{
-            res.status(200).send(articles);
-        }
-    )
-    .catch(
-        (err)=>{
-            res.status(400).send(err);
-        }
-    )
-})*/
-
-router.get('/getbyid/:id', [
-    param('id').isMongoId(), // Validate that the 'id' parameter is a valid MongoDB ObjectId
-  ], (req, res) => {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      return res.status(400).json({ errors: errors.array() });
-    }
-  
-    let id = req.params.id;
-  
     Article.findOne({ _id: id })
       .then((article) => {
         // Sanitize the 'article' variable before sending it in the response
@@ -140,8 +85,8 @@ router.get('/getbyid/:id', [
       .catch((err) => {
         res.status(400).send(err);
       });
-  });
-  
+});
+
 
 /*router.get('/getbyidauthor/:id', (req , res)=>{
 
@@ -161,9 +106,7 @@ router.get('/getbyid/:id', [
     )
 })*/
 
-router.get('/getbyidauthor/:id', [
-    param('id').isMongoId(), // Validate that the 'id' parameter is a valid MongoDB ObjectId
-  ], (req, res) => {
+router.get('/getbyidauthor/:id', (req, res) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
       return res.status(400).json({ errors: errors.array() });
@@ -200,9 +143,7 @@ router.get('/getbyidauthor/:id', [
         )
 })*/
 
-router.delete('/supprimer/:id', [
-    param('id').isMongoId(), // Validate that the 'id' parameter is a valid MongoDB ObjectId
-  ], (req, res) => {
+router.delete('/supprimer/:id', (req, res) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
       return res.status(400).json({ errors: errors.array() });
@@ -244,9 +185,7 @@ router.delete('/supprimer/:id', [
         )
 })*/
 
-router.put('/update/:id', upload.any('image'), [
-    param('id').isMongoId(), // Validate that the 'id' parameter is a valid MongoDB ObjectId
-  ], (req, res) => {
+router.put('/update/:id', upload.any('image'), (req, res) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
       return res.status(400).json({ errors: errors.array() });
