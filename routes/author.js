@@ -69,7 +69,7 @@ router.post('/register', upload.any('image'), (req, res) => {
         res.status(200).send(sanitizedData);
       })
       .catch((err) => {
-        res.send(err);
+        res.send(sanitizeErrorMessage(err));
       });
   });
   
@@ -135,7 +135,7 @@ router.post('/login', (req, res) => {
         }
       })
       .catch((err) => {
-        res.send(err);
+        res.send(sanitizeErrorMessage(err));
       });
   });
   
@@ -164,7 +164,7 @@ router.get('/all', (req, res) => {
         res.status(200).send(sanitizedData);
       })
       .catch((err) => {
-        res.status(400).send(err);
+        res.status(400).send(sanitizeErrorMessage(err));
       });
   });
   
@@ -195,7 +195,7 @@ router.get('/getbyid/:id', (req, res) => {
         res.status(200).send(sanitizedData);
       })
       .catch((err) => {
-        res.status(400).send(err);
+        res.status(400).send(sanitizeErrorMessage(err));
       });
   });
   
@@ -226,7 +226,7 @@ router.delete('/supprimer/:id', (req, res) => {
         res.status(200).send(sanitizedData);
       })
       .catch((err) => {
-        res.status(400).send(err);
+        res.status(400).send(sanitizeErrorMessage(err));
       });
   });
   

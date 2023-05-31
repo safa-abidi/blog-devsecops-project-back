@@ -40,7 +40,7 @@ router.post('/ajout', upload.any('image') , (req , res)=>{
       res.status(200).send(sanitizedData);
     })
     .catch(err => {
-      res.status(400).send(err);
+      res.status(400).send(sanitizeErrorMessage(err));
     });
 });
 
@@ -67,7 +67,7 @@ router.get('/all', (req, res) => {
         res.status(200).send(sanitizedData);
       })
       .catch((err) => {
-        res.status(400).send(err);
+        res.status(400).send(sanitizeErrorMessage(err));
       });
   });
   
@@ -83,7 +83,7 @@ router.get('/getbyid/:id', (req , res)=>{
         res.status(200).send(sanitizedData);
       })
       .catch((err) => {
-        res.status(400).send(err);
+        res.status(400).send(sanitizeErrorMessage(err));
       });
 });
 
@@ -121,7 +121,7 @@ router.get('/getbyidauthor/:id', (req, res) => {
         res.status(200).send(sanitizedData);
       })
       .catch((err) => {
-        res.status(400).send(err);
+        res.status(400).send(sanitizeErrorMessage(err));
       });
   });
   
@@ -158,7 +158,7 @@ router.delete('/supprimer/:id', (req, res) => {
         res.status(200).send(sanitizedData);
       })
       .catch((err) => {
-        res.status(400).send(err);
+        res.status(400).send(sanitizeErrorMessage(err));
       });
   });
   
@@ -207,7 +207,7 @@ router.put('/update/:id', upload.any('image'), (req, res) => {
         res.status(200).send(sanitizedData);
       })
       .catch((err) => {
-        res.status(400).send(err);
+        res.status(400).send(sanitizeErrorMessage(err));
       });
   });
   
