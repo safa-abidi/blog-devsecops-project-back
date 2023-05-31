@@ -1,7 +1,7 @@
-const express = require('express');
-const router = express.Router();
 require('dotenv').config(); // Load environment variables from .env file
+const express = require('express');
 
+const router = express.Router();
 
 
 const Author = require('../models/author');
@@ -28,7 +28,7 @@ const mystorage = multer.diskStorage({
 const upload = multer({storage: mystorage})
 
 
-/*router.post('/register' , upload.any('image') , (req, res)=>{
+router.post('/register' , upload.any('image') , (req, res)=>{
 
     data = req.body;
     author = new Author(data);
@@ -51,33 +51,13 @@ const upload = multer({storage: mystorage})
                 res.send(err)
             }
         )
-})*/
-
-router.post('/register', upload.any('image'), (req, res) => {
-    let data = req.body;
-    let author = new Author(data);
-  
-    author.image = filename;
-  
-    let salt = bcrypt.genSaltSync(10);
-    author.password = bcrypt.hashSync(data.password, salt);
-  
-    author.save()
-      .then((savedAuthor) => {
-        filename = '';
-        // Sanitize the 'savedAuthor' variable before sending it in the response
-        const sanitizedData = sanitize(savedAuthor); // Replace 'sanitize' with the appropriate function
-        res.status(200).send(sanitizedData);
-      })
-      .catch((err) => {
-        res.send(sanitizeErrorMessage(err));
-      });
-  });
-  
 
 
-/*router.post('/login' , (req, res)=>{
-    
+})
+
+
+router.post('/login' , (req, res)=>{
+
     let data = req.body;
 
     Author.findOne({email: data.email})
@@ -94,56 +74,29 @@ router.post('/register', upload.any('image'), (req, res) => {
                         fullname: author.name + ' ' + author.lastname
                     }
 
-                    let token = jwt.sign(payload , '123456789');
+                    let token = jwt.sign(payload , process.env.SECRET_KEY);
 
                     res.send({ myToken: token })
 
                 }
 
             }
+
+
         )
         .catch(
             err=>{
                 res.send(err);
             }
         )
-})*/
-
-router.post('/login', (req, res) => {
-    let data = req.body;
-  
-    Author.findOne({ email: data.email })
-      .then((author) => {
-        if (!author) {
-          res.send('email or password invalid');
-        } else {
-          let valid = bcrypt.compareSync(data.password, author.password);
-          if (!valid) {
-            res.send('email or password invalid');
-          } else {
-            let payload = {
-              _id: author._id,
-              email: author.email,
-              fullname: author.name + ' ' + author.lastname,
-            };
-            
-            let token = jwt.sign(payload, process.env.JWT_SECRET);
-  
-            // Sanitize the 'token' variable before sending it in the response
-            const sanitizedToken = sanitize(token); // Replace 'sanitize' with the appropriate function
-            res.send({ myToken: sanitizedToken });
-          }
-        }
-      })
-      .catch((err) => {
-        res.send(sanitizeErrorMessage(err));
-      });
-  });
-  
 
 
-/*router.get('/all' , (req, res)=>{
-    
+
+})
+
+
+router.get('/all' , (req, res)=>{
+
     Author.find({})
     .then(
         (authors)=>{
@@ -155,22 +108,10 @@ router.post('/login', (req, res) => {
             res.status(400).send(err);
         }
     )
-})*/
 
-router.get('/all', (req, res) => {
-    Author.find({})
-      .then((authors) => {
-        // Sanitize the 'authors' variable before sending it in the response
-        const sanitizedData = sanitize(authors); // Replace 'sanitize' with the appropriate function
-        res.status(200).send(sanitizedData);
-      })
-      .catch((err) => {
-        res.status(400).send(sanitizeErrorMessage(err));
-      });
-  });
-  
+})
 
-/*router.get('/getbyid/:id' , (req, res)=>{
+router.get('/getbyid/:id' , (req, res)=>{
     let id = req.params.id
 
     Author.findOne({ _id: id })
@@ -184,24 +125,9 @@ router.get('/all', (req, res) => {
             res.status(400).send(err);
         }
     )
-})*/
+})
 
-router.get('/getbyid/:id', (req, res) => {
-    let id = req.params.id;
-  
-    Author.findOne({ _id: id })
-      .then((author) => {
-        // Sanitize the 'author' variable before sending it in the response
-        const sanitizedData = sanitize(author); // Replace 'sanitize' with the appropriate function
-        res.status(200).send(sanitizedData);
-      })
-      .catch((err) => {
-        res.status(400).send(sanitizeErrorMessage(err));
-      });
-  });
-  
-
-/*router.delete('/supprimer/:id' , (req, res)=>{
+router.delete('/supprimer/:id' , (req, res)=>{
     let id = req.params.id
 
     Author.findByIdAndDelete({_id: id})
@@ -215,22 +141,7 @@ router.get('/getbyid/:id', (req, res) => {
                 res.status(400).send(err);
             }
         )
-})*/
-
-router.delete('/supprimer/:id', (req, res) => {
-    let id = req.params.id;
-  
-    Author.findByIdAndDelete({ _id: id })
-      .then((author) => {
-        // Sanitize the 'author' variable before sending it in the response
-        const sanitizedData = sanitize(author); // Replace 'sanitize' with the appropriate function
-        res.status(200).send(sanitizedData);
-      })
-      .catch((err) => {
-        res.status(400).send(sanitizeErrorMessage(err));
-      });
-  });
-  
+})
 
 
 
